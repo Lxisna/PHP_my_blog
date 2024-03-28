@@ -42,20 +42,20 @@ class MovieController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_movie_show_by_slug', methods: ['GET'])]
-    public function show(Movie $movie): Response
+    #[Route('/{id}', name: 'app_movie_show_by_id', methods: ['GET'])]
+    public function showById(MovieRepository $movieRepository, int $id): Response
     {
         return $this->render('movie/show.html.twig', [
-            'movie' => $movie,
+            'movie' => $movieRepository->findOneBy(['id' => $id]),
         ]);
     }
 
     ///////////////////////////////////////SLUG////////////////////////////////////////
     #[Route('/{slug}', name: 'app_movie_show_by_slug', methods: ['GET'])]
-    public function showBySlug(MovieRepository $movieRepository, int $id): Response
+    public function showBySlug(MovieRepository $movieRepository, string $slug): Response
     {
         return $this->render('movie/show.html.twig', [
-            'movie' => $movieRepository->findOneBy(['id' => $id]),
+            'movie' => $movieRepository->findOneBy(['slug' => $slug]),
         ]);
     }
 
