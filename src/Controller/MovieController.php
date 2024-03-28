@@ -7,6 +7,7 @@ use App\Form\MovieType;
 use App\Repository\MovieRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -14,6 +15,14 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/movie')]
 class MovieController extends AbstractController
 {
+    private $em;
+    private $movieRepository;
+    public function __construct(MovieRepository $movieRepository, EntityManagerInterface $em)
+    {
+        $this->movieRepository = $movieRepository;
+        $this->em = $em;
+    }
+
     #[Route('/', name: 'app_movie_index', methods: ['GET'])]
     public function index(MovieRepository $movieRepository): Response
     {
@@ -27,11 +36,28 @@ class MovieController extends AbstractController
     {
         $movie = new Movie();
         $form = $this->createForm(MovieType::class, $movie);
-        $form->handleRequest($request);
 
+        $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($movie);
-            $entityManager->flush();
+
+            $newMovie = $form->getData();
+
+            $imagePath = $form['imagePath']->getData();
+            if ($imagePath) {
+                $newFileName = uniqid() . '.' . $imagePath->guessExtension();
+                try {
+                    $imagePath->move(
+                        $this->getParameter('kernel.project_dir') . '/public/uploads',
+                        $newFileName
+                    );
+                } catch (FileException $e) {
+                    return new Response($e->getMessage());
+                }
+                $newMovie->setImagePath('/uploads/' . $newFileName);
+            }
+
+            $this->em->persist($newMovie);
+            $this->em->flush();
 
             return $this->redirectToRoute('app_movie_index', [], Response::HTTP_SEE_OTHER);
         }
