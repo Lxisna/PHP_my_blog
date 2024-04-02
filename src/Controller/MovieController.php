@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Movie;
 use App\Form\MovieType;
 use App\Repository\MovieRepository;
+use App\Service\FileUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -32,19 +33,20 @@ class MovieController extends AbstractController
     }
 
     #[Route('/new', name: 'app_movie_new', methods: ['GET', 'POST'])]
-    public function new (Request $request, EntityManagerInterface $entityManager): Response
+    public function new (Request $request, FileUploader $fileUploader): Response
     {
         $movie = new Movie();
         $form = $this->createForm(MovieType::class, $movie);
 
-        $form->handleRequest($request);
+        // $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-
-            $newMovie = $form->getData();
-
-            $imagePath = $form['imagePath']->getData();
+            /** @var UploadedFile $brochureFile */
+            $imagePath = $form->get('imagePath')->getData();
+            // $newMovie = $form->getData();
+            // $imagePath = $form['imagePath']->getData();
             if ($imagePath) {
-                $newFileName = uniqid() . '.' . $imagePath->guessExtension();
+                $newFileName = $fileUploader->upload($imagePath);
+                $movie->setImagePath($imagePath);
                 try {
                     $imagePath->move(
                         $this->getParameter('kernel.project_dir') . '/public/uploads',
@@ -53,10 +55,10 @@ class MovieController extends AbstractController
                 } catch (FileException $e) {
                     return new Response($e->getMessage());
                 }
-                $newMovie->setImagePath('/uploads/' . $newFileName);
+                $movie->setImagePath('/uploads/' . $newFileName);
             }
 
-            $this->em->persist($newMovie);
+            $this->em->persist($movie);
             $this->em->flush();
 
             return $this->redirectToRoute('app_movie_index', [], Response::HTTP_SEE_OTHER);
