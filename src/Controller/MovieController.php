@@ -36,8 +36,8 @@ class MovieController extends AbstractController
     {
         $movie = new Movie();
         $form = $this->createForm(MovieType::class, $movie);
-
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
 
             $newMovie = $form->getData();
@@ -85,8 +85,8 @@ class MovieController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_movie_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Movie $movie, EntityManagerInterface $entityManager): Response
+    #[Route('/edit/{id}', name: 'app_movie_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Movie $movie, EntityManagerInterface $entityManager, int $id): Response
     {
         $form = $this->createForm(MovieType::class, $movie);
         $form->handleRequest($request);

@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Repository\MovieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
@@ -35,8 +34,8 @@ class Movie
     #[ORM\Column(type: Types::TEXT, nullable: true, length: 255)]
     private ?string $description;
 
-    #[ORM\Column(type: Types::TEXT, length: 255)]
-    private ?string $releaseYear;
+    #[ORM\Column(type: Types::INTEGER, length: 255)]
+    private ?int $releaseYear;
 
     #[ORM\Column(length: 255)]
     private ?string $imagePath;
@@ -69,12 +68,12 @@ class Movie
         return $this;
     }
 
-    public function getReleaseYear(): ?\DateTimeInterface
+    public function getReleaseYear(): ?int
     {
         return $this->releaseYear;
     }
 
-    public function setReleaseYear(\DateTimeInterface $releaseYear): static
+    public function setReleaseYear(?int $releaseYear): static
     {
         $this->releaseYear = $releaseYear;
 

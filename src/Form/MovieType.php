@@ -47,10 +47,11 @@ class MovieType extends AbstractType
             ])
             ->add('imagePath', FileType::class, array(
                 'required' => false,
-                'mapped' => false,
+                'mapped' => false, //don't want to associate this part with Entity
             ))
             ->add('actors', EntityType::class, [
                 'class' => Actor::class,
+                'required' => false,
                 'choice_label' => 'id',
                 'multiple' => true,
             ])
