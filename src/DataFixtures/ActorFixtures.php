@@ -24,5 +24,7 @@ class ActorFixtures extends Fixture
 
         $manager->flush();
 
+        $this->addReference();
+
     }
 }
