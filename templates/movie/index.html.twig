@@ -19,16 +19,21 @@
 		<!-- Review Item -->
 		{% for movie in movies %}
 			<div class="text-center pt-8 pb-4">
-				<img src="{{ asset(movie.imagePath) }}" alt="" class="shadow-xl rounded-md"/>
+				{% if 'http' in movie.imagePath %}
+					<img src="{{ movie.imagePath }}" alt="" class="shadow-xl rounded-md"/>
+				{% else %}
+					<img src="{{ asset('uploads/movies/' ~ movie.imagePath) }}" alt="" class="shadow-xl rounded-md"/>
+				{% endif %}
+				<img src="{{ asset('uploads/movies/' ~ movie.imagePath) }}" alt="" class="shadow-xl rounded-md"/>
 
 				<h2 class="text-gray-700 font-bold text-3xl py-2">
 					{{ movie.title }}
 				</h2>
 
 				{# <span class="text-gray-500">
-													By
-													<span class="italic text-sm text-gray-800">{{movie.actors}}
-													</span> #}
+																													By
+																													<span class="italic text-sm text-gray-800">{{movie.actors}}
+																													</span> #}
 
 				<p class="text-base text-gray-700 pt-4 pb-10 leading-8 font-light">
 					{{ movie.description }}

@@ -8,7 +8,6 @@ use App\Repository\MovieRepository;
 use App\Service\FileUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -42,22 +41,11 @@ class MovieController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var UploadedFile $brochureFile */
             $imagePath = $form->get('imagePath')->getData();
-            // $newMovie = $form->getData();
-            // $imagePath = $form['imagePath']->getData();
             if ($imagePath) {
                 $newFileName = $fileUploader->upload($imagePath);
-                $movie->setImagePath($imagePath);
-                try {
-                    $imagePath->move(
-                        $this->getParameter('kernel.project_dir') . '/public/uploads',
-                        $newFileName
-                    );
-                } catch (FileException $e) {
-                    return new Response($e->getMessage());
-                }
-                $movie->setImagePath('/uploads/' . $newFileName);
+                $movie->setImagePath($newFileName);
             }
-
+            $this->addFlash('green', 'Movie added succesfully');
             $this->em->persist($movie);
             $this->em->flush();
 
