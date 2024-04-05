@@ -52,7 +52,7 @@ class MovieType extends AbstractType
             ->add('actors', EntityType::class, [
                 'class' => Actor::class,
                 'required' => false,
-                'choice_label' => 'id',
+                'choice_label' => 'name',
                 'multiple' => true,
             ])
         ;
